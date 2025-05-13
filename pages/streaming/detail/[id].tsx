@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Streaming } from '@/app/types/streaming'
+import ErrorMessage from '@/app/components/ErrorMessage'
 
 export default function StreamingDetailPage () {
   const router = useRouter()
@@ -9,15 +10,16 @@ export default function StreamingDetailPage () {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
-  console.log(id)
   useEffect(() => {
+    if (!id) return
+    
     const token = localStorage.getItem('token')
 
-    if (!token || token === 'undefined') {
+    if (!token) {
       router.replace('/auth/login')
     }
 
-    fetch(`http://localhost:3000/streaming/${id}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/streaming/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -25,17 +27,21 @@ export default function StreamingDetailPage () {
       }
     })
       .then(async res => {
-        if (!res.ok) throw new Error('Unauthorized or failed to fetch')
         const data = await res.json()
-        setStreaming(data)
-        setLoading(false)
+        if (!res.ok || data?.statusCode === 404) {
+          setError(data.message)
+          setLoading(false)
+        } else {
+          setStreaming(data)
+          setLoading(false)
+        }
       })
       .catch(err => {
         console.error(err)
-        setError('Failed to fetch videos')
+        setError('Failed to fetch video')
         setLoading(false)
       })
-  }, [router])
+  }, [id, router])
 
   return (
     <main className='p-8'>
@@ -44,13 +50,15 @@ export default function StreamingDetailPage () {
       <div className='mt-6'>
         {loading ? (
           <p className='text-gray-500'>Loading...</p>
+        ) : error ? (
+          <ErrorMessage message={error} />
         ) : streaming ? (
           <div className='max-w-4xl mx-auto px-4 py-8'>
             <h1 className='text-lg font-bold text-gray-800 mb-6'>
               {streaming.title}
             </h1>
 
-           <div className="w-full max-w-4xl mx-auto aspect-video rounded-lg shadow overflow-hidden">
+            <div className="w-full max-w-4xl mx-auto aspect-video rounded-lg shadow overflow-hidden">
               <video
                 src={streaming.videoUrl}
                 controls
@@ -63,7 +71,7 @@ export default function StreamingDetailPage () {
             </p>
           </div>
         ) : (
-          <p className='text-red-500'>Streaming not found</p>
+          <ErrorMessage message={'Streaming not found'} />
         )}
       </div>
     </main>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import StreamingList from './components/StreamingList'
 import { Streaming } from './types/streaming'
+import ErrorMessage from './components/ErrorMessage'
 
 export default function Home () {
   const [streamings, setStreamings] = useState<Streaming[]>([])
@@ -12,11 +13,11 @@ export default function Home () {
   useEffect(() => {
     const token = localStorage.getItem('token')
 
-    if (!token || token === 'undefined') {
+    if (!token) {
       router.replace('/auth/login')
     }
 
-    fetch('http://localhost:3000/streaming', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/streaming`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -44,7 +45,7 @@ export default function Home () {
 
       <div className='mt-6'>
         {error ? (
-          <p className='text-red-500'>{error}</p>
+          <ErrorMessage message={error} />
         ) : (
           <StreamingList streamings={streamings} />
         )}

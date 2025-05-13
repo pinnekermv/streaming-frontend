@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from '../../styles/LoginForm.module.css'
+import ErrorMessage from '@/app/components/ErrorMessage'
 
 export default function LoginForm () {
   const router = useRouter()
@@ -9,10 +10,10 @@ export default function LoginForm () {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    fetch('http://localhost:3000/auth/login', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,13 +22,13 @@ export default function LoginForm () {
     })
       .then(async res => {
         const data = await res.json()
-        console.log(data)
+      
         if (!res.ok) {
-          setError('An error')
+          setError(data.message)
+        } else {
+          localStorage.setItem('token', data.token)
+          router.replace('/')
         }
-
-        localStorage.setItem('token', data.token)
-        router.replace('/')
       })
       .catch(err => {
         console.error(err)
@@ -45,9 +46,11 @@ export default function LoginForm () {
           * contact the administrator to have one
         </h4>
       </div>
+      
+      {error && ( <ErrorMessage message={error} /> )}
 
       <div className='mt-10 sm:mx-auto sm:w-full sm:max-w-sm'>
-        <form onSubmit={handleRegister} method='POST' className='space-y-6'>
+        <form onSubmit={handleLogin} className='space-y-6'>
           <div>
             <label htmlFor='username' className={styles.label}>
               Username
@@ -56,7 +59,7 @@ export default function LoginForm () {
               <input
                 id='username'
                 name='username'
-                type='username'
+                type='text'
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 required

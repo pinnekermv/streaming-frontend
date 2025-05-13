@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token && token !== 'undefined') {
+    if (token) {
       router.replace('/');
     }
   }, [router]);
