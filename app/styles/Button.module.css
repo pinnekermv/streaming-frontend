@@ -1,0 +1,23 @@
+.openButton {
+    color: #1d4ed8; /* text-blue-700 */
+    border: 1px solid #1d4ed8; /* border-blue-700 */
+    border-radius: 0.5rem; /* rounded-lg */
+    font-weight: 500; /* font-medium */
+    font-size: 0.875rem; /* text-sm */
+    padding: 0.625rem 1.25rem; /* px-5 py-2.5 */
+    text-align: center; /* text-center */
+    margin-right: 0.5rem; /* me-2 */
+    margin-bottom: 0.5rem; /* mb-2 */
+    margin-top: 1rem; /* mt-4 */
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  .openButton:hover {
+    color: #ffffff;
+    background-color: #1e40af; /* bg-blue-800 */
+  }
+  
+  .openButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.5); /* focus:ring-4 focus:ring-blue-300 */
+  }
